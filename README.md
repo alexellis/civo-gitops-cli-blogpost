@@ -1,7 +1,6 @@
 # Deploy your applications to Civo with GitOps
 
-
-In this learn guide we will apply the principles of GitOps to deploy applications to VMs on Civo whenever changes are committed to our GitHub repository.
+In this Learn guide we will apply the principles of GitOps to deploy a static website to a VM on Civo. At the end of the guide we'll have a GitOps pipeline with GitHub, Travis and Civo which ensures our static website is up and running in our desired state.
 
 ## What is GitOps?
 
@@ -12,6 +11,10 @@ GitOps was first coined by Alexis Richardson, the CEO of Weaveworks.
 > Describe the desired state of the whole system using a declarative specification for each environment.
 
 That means that you can at any time delete your staging or production cluster, and immediately recreate it from the configuration and descriptions stored in a `git` repository. By using `git` we can add new changes, releases or even revert back to a known state by performing operations on our source control system.
+
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Sparkling presentation on <a href="https://twitter.com/hashtag/gitops?src=hash&amp;ref_src=twsrc%5Etfw">#gitops</a> in production by <a href="https://twitter.com/lukeb0nd?ref_src=twsrc%5Etfw">@lukeb0nd</a> at <a href="https://twitter.com/hashtag/monzon?src=hash&amp;ref_src=twsrc%5Etfw">#monzon</a> with <a href="https://twitter.com/CloudNativeLDN?ref_src=twsrc%5Etfw">@CloudNativeLDN</a> <a href="https://t.co/QDtUW6V0UW">pic.twitter.com/QDtUW6V0UW</a></p>&mdash; Brian Linuxing 🇮🇪 🇪🇺 (@BrianLinuxing) <a href="https://twitter.com/BrianLinuxing/status/1072949632274190336?ref_src=twsrc%5Etfw">December 12, 2018</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+
+*Pictured: a Tweet showing GitOps, applied to Kubernetes*
 
 Another way that Alexis talks about GitOps is: "Operations by Pull Request"
 
@@ -327,6 +330,10 @@ Then click to see the logs, you should see a list of our instances including the
 
 ### Create a VM with GitOps
 
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Stop by the <a href="https://twitter.com/weaveworks?ref_src=twsrc%5Etfw">@weaveworks</a> booth to get your <a href="https://twitter.com/hashtag/gitops?src=hash&amp;ref_src=twsrc%5Etfw">#gitops</a> rubix cube and chat to <a href="https://twitter.com/stefanprodan?ref_src=twsrc%5Etfw">@stefanprodan</a> + <a href="https://twitter.com/monadic?ref_src=twsrc%5Etfw">@monadic</a> about Kube, Cortex, Scope and Istio <a href="https://t.co/ElTzb9gF3q">pic.twitter.com/ElTzb9gF3q</a></p>&mdash; Alex Ellis (@alexellisuk) <a href="https://twitter.com/alexellisuk/status/1130761532739076097?ref_src=twsrc%5Etfw">May 21, 2019</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+
+*Pictured: GitOps swag at KubeCon, Barcelona*
+
 One of the attractions to GitOps is that it's declarative, which means it can remediate the state we desire based upon the state found.
 
 If the VM is present, it should run the commands we need via `ssh` to deploy our code.
@@ -562,7 +569,9 @@ If you want to see the final state of the GitHub repository with all the scripts
 
 * [alexellis/civo-prod-app](https://github.com/alexellis/civo-prod-app)
 
-If we took things further we could write that code in Ruby, Go or Node.js for instance and then come up with a JSON, YAML or DSL file to store our state. It might look a bit like this:
+If we took things further we could write that code in Ruby, Go or Node.js for instance. [Weave Flux](https://github.com/fluxcd/flux) is a Kubernetes operator, that can perform GitOps for Kubernetes objects.
+
+We could also design a bespoke DSL, YAML, or JSON file to store our desired state. It might look a bit like this:
 
 ```yaml
 # This is just an example.
@@ -577,7 +586,9 @@ packages:
    package: "nginx"
 ```
 
-You could use the example GitHub repository with any client and know that if you ever lost a VM host, you could restore the state back to how it was by simple triggering a `git commit`. You can think of GitOps as a kind of insurance policy.
+The sample created for this guide could be used for your own use, or with clients that you have which need static hosting.
+
+You can think of GitOps as a kind of insurance policy. If the VM is ever lost or deleted, run a `git commit` and the state will be restored again. If the client or your business need a wording change on a webpage, just `git commit` and rest assured that in a few moments the change will be live.
 
 We could extend what we are deploying in Civo and create a firewall along with a load-balancer so that our instance can be replaced without our users knowing.
 

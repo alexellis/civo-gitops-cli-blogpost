@@ -64,7 +64,7 @@ The current API Key is now production
 
 Now let's test out one of the commands:
 
-```
+```sh
 # civo
 Commands:
   civo apikey          # manage API keys stored in the client
@@ -116,7 +116,7 @@ So it looks like we have some helpful defaults to get started with, and then we 
 
 We do need to find the template ID for Ubuntu, since that's what we want to run on.
 
-```
+```sh
 # civo template list |grep "Ubuntu 18"
 | 811a8dfb-8202-49ad-b1ef-1e6320b20497 | Ubuntu 18.04         | e4838e89-f086-41a1-86b2-60bc4b0a259e | 98feca21-6cdb-439e-bd0f-3311c693f350 | ubuntu           |
 ```
@@ -217,7 +217,7 @@ Use the content from the `id_rsa.pub` file.
 
 Now we have to identify your Civo SSH key, so that we can use it in the CLI when we create a new VM. It will allow an automated, non-interactive login. This is just what we need for a GitOps pipeline.
 
-```
+```sh
 # civo ssh-key list
 
 +--------------------------------------+-----------------------+----------------------------------------------------+
@@ -262,7 +262,11 @@ civo apikey current production
 
 civo instance list
 
-export KEY_DIR="~/.ssh"
+
+export KEY_DIR="$HOME/.ssh"
+
+echo "Creating SSH keys: $KEY_DIR"
+
 mkdir -p $KEY_DIR
 chmod 700 $KEY_DIR
 
@@ -270,7 +274,15 @@ chmod 700 $KEY_DIR
 echo -n "${SSH_PUBLIC_KEY}" | base64 --decode > $KEY_DIR/id_rsa.pub
 echo -n "${SSH_PRIVATE_KEY}" | base64 --decode > $KEY_DIR/id_rsa
 
+chmod 600 $KEY_DIR/id_rsa
+
 echo -n $SSH_KEY_ID > $HOME/key_ids.txt
+
+# Check the keys exist correctly:
+echo "HOME: $HOME"
+
+cat $HOME/.ssh/id_rsa.pub
+stat $HOME/.ssh/id_rsa
 ```
 
 The job of `prepare.sh` is to rehydrate the secrets back onto the disk so that they can be used in our pipeline.
@@ -341,7 +353,7 @@ then
     civo instance create \
     ${HOSTNAME} \
     --template=${TEMPLATE} \
-    --ssh="${SSH_KEY_ID}"
+    --ssh-key="${SSH_KEY_ID}"
 fi
 ```
 
@@ -355,10 +367,10 @@ git push origin master
 
 ### Now let's add in the deployment
 
-We'll now run an SSH command:
+We'll now run an SSH command to test everything works:
 
 ```sh
-ssh civo@$IP "cat /etc/os-release"
+ssh -i $HOME/.ssh/id_rsa civo@$IP "cat /etc/os-release"
 ```
 
 Edit `./gitops/deploy.sh`:
@@ -379,7 +391,7 @@ then
     civo instance create \
     ${HOSTNAME} \
     --template=${TEMPLATE} \
-    --ssh="${SSH_KEY_ID}"
+    --ssh-key="${SSH_KEY_ID}"
 fi
 
 # Instance takes 40 secs +/- to build
@@ -393,7 +405,7 @@ for i in {0..120}; do
 
         export IP=$(grep "Public IP" instance.txt | cut -d ">" -f2 |tr -d " ") 
         echo $IP
-        ssh -oStrictHostKeyChecking=no civo@$IP "cat /etc/os-release"
+        ssh -i $HOME/.ssh/id_rsa -oStrictHostKeyChecking=no civo@$IP "cat /etc/os-release"
 
         break
     fi
@@ -450,11 +462,13 @@ then
     civo instance create \
     ${HOSTNAME} \
     --template=${TEMPLATE} \
-    --ssh="${SSH_KEY_ID}"
+    --ssh-key="${SSH_KEY_ID}"
 fi
 
 # Instance takes 40 secs +/- to build
 for i in {0..120}; do
+    echo "Checking instance status, attempt: $i"
+
     civo instance show "${HOSTNAME}" > instance.txt
     grep "ACTIVE" instance.txt
 
@@ -464,16 +478,23 @@ for i in {0..120}; do
 
         export IP=$(grep "Public IP" instance.txt | cut -d ">" -f2 |tr -d " ") 
         echo $IP
-        ssh -oStrictHostKeyChecking=no civo@$IP "sudo apt update && sudo apt install -qy nginx"
-        scp -r -oStrictHostKeyChecking=no webroot civo@$IP:~/webroot
-        ssh -oStrictHostKeyChecking=no civo@$IP "sudo rm -rf /var/www/html/* && sudo cp -r webroot/* /var/www/html/"
+
+        ssh -i $HOME/.ssh/id_rsa -oStrictHostKeyChecking=no civo@$IP "uptime"
+        # SSH may not be up and running yet, so continue
+        if [ "$?" -ne "0" ]
+        then
+            sleep 5
+            continue
+        fi
+        ssh -i $HOME/.ssh/id_rsa -oStrictHostKeyChecking=no civo@$IP "sudo apt update && sudo apt install -qy nginx"
+        scp -i $HOME/.ssh/id_rsa -r -oStrictHostKeyChecking=no webroot civo@$IP:~/webroot
+        ssh -i $HOME/.ssh/id_rsa -oStrictHostKeyChecking=no civo@$IP "sudo rm -rf /var/www/html/* && sudo cp -r webroot/* /var/www/html/"
 
         break
     fi
 
     sleep 10
 done
-
 ```
 
 We edited the script to do the following:
@@ -490,13 +511,70 @@ git commit --signoff -m "Install Nginx and deploy the static website"
 git push origin master
 ```
 
+You should see an output like this:
+
+![](./images/gitops-rocks.png)
+
+Now delete the VM instance with:
+
+```sh
+export HOSTNAME="gitops-prod.example.com"
+civo instance delete $HOSTNAME
+```
+
+Edit one of the files and do another commit, you'll see your instance come back up with a new IP in the Travis job within a few moments.
+
+```sh
+echo "Trigger a build" > "automated.txt"
+git add .
+git commit --signoff -m "Recreate my instance"
+git push origin master
+```
+
+Now try to edit your webpage:
+
+
+Edit `index.html` in `webroot` in the repository:
+
+```html
+<html>
+<body style="background: green; text: white">
+    <h1>GitOps rocks!</h1>
+</body>
+</html>
+```
+
+Deploy it:
+
+```sh
+git add .
+git commit --signoff -m "Update my webpage"
+git push origin master
+```
+
 ### Wrapping up
 
-To wrap up this guide, we have tried out the Civo CLI to create instances, found out how to install it and how to add our API key. We then went on to setup a full GitOps pipeline using bash scripts and deployed a static website with Nginx.
+To wrap up this guide, we have tried out the Civo CLI to create instances, found out how to install it and how to add our API key. We then went on to setup a full GitOps pipeline using bash scripts and deployed a static website with Nginx. Our bash script became a controller, tasked with remediating our desired state.
+
+If we took things further we could write that code in Ruby, Go or Node.js for instance and then come up with a JSON, YAML or DSL file to store our state. It might look a bit like this:
+
+```yaml
+# This is just an example.
+hostname: gitops-production.example.com
+folders:
+ - name: webroot
+   source: ./webroot
+   destination: /var/www/html/
+packages:
+ - name: nginx
+   update_apt: true
+   package: "nginx"
+```
 
 You could use the example GitHub repository with any client and know that if you ever lost a VM host, you could restore the state back to how it was by simple triggering a `git commit`. You can think of GitOps as a kind of insurance policy.
+
+We could extend what we are deploying in Civo and create a firewall along with a load-balancer so that our instance can be replaced without our users knowing.
 
 * Find out more about [Travis](https://travis-ci.org)
 * Hear [Alexis talking about GitOps and Kubernetes](https://www.youtube.com/watch?v=BSqE2RqctNs) at KubeCon
 * Star the [Civo CLI](https://github.com/civo/cli)
-

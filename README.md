@@ -486,9 +486,10 @@ for i in {0..120}; do
             sleep 5
             continue
         fi
-        ssh -i $HOME/.ssh/id_rsa -oStrictHostKeyChecking=no civo@$IP "sudo apt update && sudo apt install -qy nginx"
-        scp -i $HOME/.ssh/id_rsa -r -oStrictHostKeyChecking=no webroot civo@$IP:~/webroot
+
+        scp -i $HOME/.ssh/id_rsa -r -oStrictHostKeyChecking=no webroot civo@$IP:~/
         ssh -i $HOME/.ssh/id_rsa -oStrictHostKeyChecking=no civo@$IP "sudo rm -rf /var/www/html/* && sudo cp -r webroot/* /var/www/html/"
+        ssh -i $HOME/.ssh/id_rsa -oStrictHostKeyChecking=no civo@$IP "sudo apt update && sudo apt install -qy nginx"
 
         break
     fi
@@ -533,12 +534,11 @@ git push origin master
 
 Now try to edit your webpage:
 
-
 Edit `index.html` in `webroot` in the repository:
 
 ```html
 <html>
-<body style="background: green; text: white">
+<body style="background: green; color: white">
     <h1>GitOps rocks!</h1>
 </body>
 </html>
@@ -552,9 +552,15 @@ git commit --signoff -m "Update my webpage"
 git push origin master
 ```
 
+![](./images/updated-web.png)
+
 ### Wrapping up
 
 To wrap up this guide, we have tried out the Civo CLI to create instances, found out how to install it and how to add our API key. We then went on to setup a full GitOps pipeline using bash scripts and deployed a static website with Nginx. Our bash script became a controller, tasked with remediating our desired state.
+
+If you want to see the final state of the GitHub repository with all the scripts you can get it here:
+
+* [alexellis/civo-prod-app](https://github.com/alexellis/civo-prod-app)
 
 If we took things further we could write that code in Ruby, Go or Node.js for instance and then come up with a JSON, YAML or DSL file to store our state. It might look a bit like this:
 

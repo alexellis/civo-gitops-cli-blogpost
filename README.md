@@ -402,7 +402,9 @@ git push origin master
 
 ### Now let's add in the deployment
 
-We'll now run an SSH command to test everything works:
+We'll now edit our script to run a basic command over SSH using the SSH key that we generated to test that everything works:
+
+We'll be adding the following. You'll also see how we find the value for `$IP` using the CLI and `grep`.
 
 ```sh
 ssh -i $HOME/.ssh/id_rsa civo@$IP "cat /etc/os-release"

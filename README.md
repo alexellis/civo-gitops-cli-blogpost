@@ -37,7 +37,9 @@ So it could be viewed as a brand, or distribution of Continuous Delivery.
 
 ### How can we use GitOps with Civo's new CLI?
 
-The Civo team recently released a new CLI which has been completely re-written in Ruby. It can be used to manage your infrastructure on the platform including:
+The Civo team recently released a new CLI which has been completely re-written in Ruby as part of a move away from Go. You can find out more about [why the team made this decision](https://www.civo.com/blog/everything-changes-but-kinda-not). If you've used the [legacy Go CLI](https://github.com/civo/cli-legacy), it's still available but won't be maintained going forward. 
+
+The CLI can be used to manage your infrastructure on the platform including:
 
 * VM instances
 * Firewalls

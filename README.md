@@ -20,7 +20,20 @@ Another way that Alexis talks about GitOps is: "Operations by Pull Request"
 
 You could imagine that you are a growing team with all your code stored in GitHub. You restrict access to various GitHub repositories through the use of "teams". When following a GitOps model, you can on-board a new member of staff simply by sending a pull-request to a repository where you keep your team definitions.
 
-Isn't this just Continuous Delivery, or Infrastructure as Code? Haven't we seen it all before? It can be a confusing topic, so checkout the post on [What is GitOps really?](http://bit.ly/2MJgwVm)
+### How does this compare to Continuous Delivery (CD), or Infrastructure as Code (IaC)?
+
+A question that comes up when exploring GitOps, is how is this different from prior work such as Continuous Delivery, or Infrastructure as Code?
+
+GitOps as [popularised by Weaveworks](https://www.weave.works/blog/what-is-gitops-really) looks like:
+
+* Often segregates the build or continuous integration (CI) phase
+* Works with Kubernetes only
+* Infrastructure is excluded, which means Terraform isn't part of it
+* Long-running controller runs inside Kubernetes
+* The controller checks for difference between desired and observed state
+* The controller remediates and takes actions
+
+So it could be viewed as a brand, or distribution of Continuous Delivery.
 
 ### How can we use GitOps with Civo's new CLI?
 
@@ -35,6 +48,19 @@ The Civo team recently released a new CLI which has been completely re-written i
 All of the above is also available through the [developer API](https://www.civo.com/api) with code examples. The CLI brings a user-friendly experience to the API and means you can authenticate and create a new VM with ease.
 
 This tool sounds ideal for use in a GitOps pipeline which we will explore in the tutorial.
+
+#### Our use of GitOps principles
+
+In the interests of keeping things simple we will demonstrate some of the spirit of GitOps, whilst following Alexis' original definition of "Operations by Pull Request".
+
+* We will automate Civo infrastructure. GitOps normally doesn't care about infrastructure.
+* Our remediation logic will be written in bash and run within our pipeline. GitOps prefers to run a separate daemon, but this does require additional infrastructure.
+* Given that we have a static site, there is no "CI" phase, so we follow the GitOps principle here. 
+* We will deploy a static website and use `systemd` and Nginx to host it. GitOps normally only orchestrates Kubernetes.
+
+By the end of the tutorial, you'll see something like the screen below, where committing a new HTML file into git causes a fresh deployment of a site.
+
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Look, ma! No Kubernetes!<br><br>Working on a new blog post / tutorial for a client, showing <a href="https://twitter.com/hashtag/GitOps?src=hash&amp;ref_src=twsrc%5Etfw">#GitOps</a> in action for a static site deployment on a VM with Nginx. The controller is even written in bash.<br><br>Follow me, and keep your eyes peeled for the write-up<a href="https://t.co/sLzOQF57um">https://t.co/sLzOQF57um</a> <a href="https://t.co/e1Q1wVUQzo">pic.twitter.com/e1Q1wVUQzo</a></p>&mdash; Alex Ellis (@alexellisuk) <a href="https://twitter.com/alexellisuk/status/1149028782336106498?ref_src=twsrc%5Etfw">July 10, 2019</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 ### A quick look at the CLI
 

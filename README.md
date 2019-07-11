@@ -1,6 +1,6 @@
 # Deploy your applications to Civo with GitOps
 
-In this Learn guide we will apply the principles of GitOps to deploy a static website to a VM on Civo. At the end of the guide we'll have a GitOps pipeline with GitHub, Travis and Civo which ensures our static website is up and running in our desired state.
+This *Civo guide*, we will demonstrate the principles of GitOps to deploy a static website to a VM on Civo. At the end of the guide we'll have a GitOps pipeline with GitHub, Travis and Civo which ensures our website is up and running in our desired state.
 
 ## What is GitOps?
 

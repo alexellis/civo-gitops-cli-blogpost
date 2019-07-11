@@ -12,9 +12,9 @@ GitOps was first coined by Alexis Richardson, the CEO of Weaveworks.
 
 That means that you can at any time delete your staging or production cluster, and immediately recreate it from the configuration and descriptions stored in a `git` repository. By using `git` we can add new changes, releases or even revert back to a known state by performing operations on our source control system.
 
-<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Sparkling presentation on <a href="https://twitter.com/hashtag/gitops?src=hash&amp;ref_src=twsrc%5Etfw">#gitops</a> in production by <a href="https://twitter.com/lukeb0nd?ref_src=twsrc%5Etfw">@lukeb0nd</a> at <a href="https://twitter.com/hashtag/monzon?src=hash&amp;ref_src=twsrc%5Etfw">#monzon</a> with <a href="https://twitter.com/CloudNativeLDN?ref_src=twsrc%5Etfw">@CloudNativeLDN</a> <a href="https://t.co/QDtUW6V0UW">pic.twitter.com/QDtUW6V0UW</a></p>&mdash; Brian Linuxing 🇮🇪 🇪🇺 (@BrianLinuxing) <a href="https://twitter.com/BrianLinuxing/status/1072949632274190336?ref_src=twsrc%5Etfw">December 12, 2018</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">All of the <a href="https://twitter.com/ChickfilA?ref_src=twsrc%5Etfw">@ChickfilA</a> edge <a href="https://twitter.com/kubernetesio?ref_src=twsrc%5Etfw">@kubernetesio</a> clusters are managed via <a href="https://twitter.com/hashtag/gitops?src=hash&amp;ref_src=twsrc%5Etfw">#gitops</a><a href="https://twitter.com/monadic?ref_src=twsrc%5Etfw">@monadic</a> <a href="https://twitter.com/hashtag/KubeCon?src=hash&amp;ref_src=twsrc%5Etfw">#KubeCon</a> <a href="https://t.co/xxt8CLZCdb">pic.twitter.com/xxt8CLZCdb</a></p>&mdash; Daniel Bryant (@danielbryantuk) <a href="https://twitter.com/danielbryantuk/status/1072942397233934336?ref_src=twsrc%5Etfw">December 12, 2018</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
 
-*Pictured: a Tweet showing GitOps, applied to Kubernetes*
+*Pictured: a Tweet showing GitOps*
 
 Another way that Alexis talks about GitOps is: "Operations by Pull Request"
 

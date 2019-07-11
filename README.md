@@ -143,11 +143,11 @@ Description:
 
 So it looks like we have some helpful defaults to get started with, and then we can specify some additional values like hostname, too.
 
-We do need to find the template ID for Ubuntu, since that's what we want to run on.
+We do need to find the template ID for Ubuntu, since that's what we want to run on. You can list all the templates with `civo template list` and see verbose information with `--verbose`. We just need the first column, so we can run:
 
 ```sh
-# civo template list |grep "Ubuntu 18"
-| 811a8dfb-8202-49ad-b1ef-1e6320b20497 | Ubuntu 18.04         | e4838e89-f086-41a1-86b2-60bc4b0a259e | 98feca21-6cdb-439e-bd0f-3311c693f350 | ubuntu           |
+civo template list |grep "Ubuntu 18"
+| 811a8dfb-8202-49ad-b1ef-1e6320b20497 | Ubuntu 18.04         |
 ```
 
 Great, it's `811a8dfb-8202-49ad-b1ef-1e6320b20497`, so:
